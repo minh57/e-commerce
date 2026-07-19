@@ -94,7 +94,6 @@ const ProductVariant = () => {
                                             maxHeight: '100%'
                                         }} src={row.thumbnail} alt={row.name} />
                                     </Box>
-                                    
                                 </TableCell>
 
                                 <TableCell>{row.products?.name}</TableCell>
