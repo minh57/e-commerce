@@ -28,7 +28,7 @@ const columns = [
 ]
 const renderCell = (row,column,i) =>{
     const cellValue = row[column.field];
-    console.log(column.field + ': ' + cellValue);
+    // console.log(column.field + ': ' + cellValue);
     switch (column.type){
       case 'text':
         return <TableCell key={i}>{cellValue}</TableCell>;
@@ -68,7 +68,7 @@ const initialForm = columns.reduce((acc,item) => {
 const Colors = () => {
     const [dataResult, setDataResult] = useState([]);
     const [loading, setLoading] = useState(true);
-    const fetchSizes = async () => {
+    const fetchColors = async () => {
         try {
             const {data,error} = await supabase
                 .from(tableName)
@@ -87,7 +87,7 @@ const Colors = () => {
         }
     }
     useEffect(() => {
-        fetchSizes();
+        fetchColors();
     }, []);
 
     const [open, setOpen] = useState(false);
@@ -147,7 +147,7 @@ const Colors = () => {
       }
       console.log('Success: ',data);
         handleClose(); 
-        fetchSizes();
+        fetchColors();
       } catch (error){
         console.error('Lỗi lấy data từ Supabase:', error.message);
       }
@@ -166,7 +166,7 @@ const Colors = () => {
         }
         console.log('Success: ',data);
           handleClose(); 
-          fetchSizes();
+          fetchColors();
       }
     catch (error){
         console.error('Lỗi lấy data từ Supabase:', error.message);
@@ -197,9 +197,11 @@ const Colors = () => {
                       <Table aria-label="database table">
                         <TableHead sx={{ backgroundColor: '#eeeeee' }}>
                           <TableRow>
-                            <TableCell style={{ fontWeight: 'bold' }}>ID</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }}>Tên</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }}>Code</TableCell>
+                            {
+                              columns.map((col,i) => {
+                                return (<TableCell key={i} style={{ fontWeight: 'bold' }}>{col.label}</TableCell>)
+                              })
+                            }
                             <TableCell style={{ fontWeight: 'bold' }} align="center">Thao tác</TableCell>
                           </TableRow>
                         </TableHead>
