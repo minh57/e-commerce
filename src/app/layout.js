@@ -7,7 +7,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="vi">
+    // hết ngày thêm lại lang vi
+    <html >
       <body>
         {/* Tất cả các trang con và layout con sẽ được bơm vào đây */}
         {children}

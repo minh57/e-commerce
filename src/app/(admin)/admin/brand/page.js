@@ -1,24 +1,43 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import {Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Stack, Chip, CircularProgress } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
 import { supabase } from '@/utils/supabase';
-const Sizes = () => {
-    const [brands, setBrands] = useState([]);
+import CrudTable from '@/app/components/CrudTable'
+
+const title = 'thương hiệu';
+const tableName = 'brands';
+const columns = [
+  {
+      field: 'id',
+      label: 'ID',
+      type: 'text'
+  },
+  {
+      field: 'name',
+      label: 'Tên ' + title,
+      type:'text'
+  },
+  {
+      field: 'slug',
+      label: 'Slug',
+      type:'text'
+  }
+]
+const listCol = columns.map((item) => item.field).join(",")
+const initialForm = columns.reduce((acc,item) => {
+  acc[item.field] = '';
+  return acc;
+}, {});
+
+const Brands = () => {
+    const [dataResult, setDataResult] = useState([]);
     const [loading, setLoading] = useState(true);
-    const fetchBrands = async () => {
+    const fetchData = async () => {
         try {
             const {data,error} = await supabase
-                .from('brands')
-                .select(`
-                    id,
-                    name,
-                    slug
-                `);
+                .from(tableName)
+                .select(listCol);
             if(error) throw error;
-            setBrands(data || []);
+            setDataResult(data || []);
         }
         catch (error) {
             console.error('Lỗi lấy data từ Supabase:', error.message);
@@ -27,63 +46,101 @@ const Sizes = () => {
         }
     }
     useEffect(() => {
-        fetchBrands();
+        fetchData();
     }, []);
+
+    const [open, setOpen] = useState(false);
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+    const [formData,setFormData] = useState(initialForm);
+
+    const updateFormField = (name,value) =>{
+      setFormData((prev) => ({
+        ...prev,
+        [name]:value
+      }));
+    }
+
+    const handleInputChange = (e) =>{
+      const {name,value} = e.target;
+      updateFormField(name,value);
+    }
+
+    const handleAdd = () =>{
+      setFormData(initialForm);
+      handleOpen();
+    }
+
+    const handleEdit = (row) => {
+      setFormData(row);
+      handleOpen();
+    }
+
+    const handleSubmit = async (e) =>{
+      e.preventDefault();
+      try{
+        let response;
+      if(formData.id){
+        response = await supabase
+          .from(tableName)
+          .update(formData)
+          .eq('id',formData.id)
+          .select();
+      }
+      else {
+        const dataToInsert = { ...formData};
+        if(dataToInsert.id === ''){
+          delete dataToInsert.id;
+        }
+
+        response = await supabase
+        .from(tableName)
+        .insert([dataToInsert])
+        .select();
+      }      
+      
+      const {data,error} = response;
+      if(error){
+        throw error
+      }
+      console.log('Success: ',data);
+        handleClose(); 
+        fetchData();
+      } catch (error){
+        console.error('Lỗi lấy data từ Supabase:', error.message);
+      }
+    } 
+    
+    const handleDelete = async (row) =>{
+      try{
+        let response = await supabase 
+          .from(tableName)
+          .delete()
+          .eq('id',row.id)
+          .select()
+              const {data,error} = response;
+        if(error){
+          throw error
+        }
+        console.log('Success: ',data);
+          handleClose(); 
+          fetchData();
+      }
+    catch (error){
+        console.error('Lỗi lấy data từ Supabase:', error.message);
+      }
+  }
+
+    useEffect(()=>
+    {
+      console.log(formData);
+    },[formData])
+
     return(
-        <Stack spacing={3}>
-            <Stack sx={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                Danh sách thương hiệu
-                </Typography>
-                <Button variant="contained" startIcon={<AddIcon />} color="success">
-                Thêm thương hiệu mới
-                </Button>
-            </Stack>
-                  {loading ? (
-                    <Stack sx={{ alignItems: 'center', py: 5 }}><CircularProgress /></Stack>
-                  ) : (
-                    <TableContainer component={Paper} sx={{ boxShadow: 2 }}>
-                      <Table aria-label="database table">
-                        <TableHead sx={{ backgroundColor: '#eeeeee' }}>
-                          <TableRow>
-                            <TableCell style={{ fontWeight: 'bold' }}>ID</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }}>Tên</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }}>Slug</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }} align="center">Thao tác</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {brands.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={5} align="center">Chưa có thương hiệu trong database</TableCell>
-                            </TableRow>
-                          ) : (
-                            brands.map((row) => (
-                              <TableRow key={row.id} hover>
-
-                                <TableCell>{row.id}</TableCell>
-
-                                <TableCell sx={{ fontWeight: '500' }}>{row.name}</TableCell>
-
-                                <TableCell>{row.slug}</TableCell>
-
-                                <TableCell align="center">
-                                  <Stack sx={{ flexDirection: 'row', gap: 1, justifyContent: 'center' }}>
-                                    <Button size="small" variant="outlined" startIcon={<EditIcon />} color="info">Sửa</Button>
-                                    <Button size="small" variant="outlined" startIcon={<DeleteIcon />} color="error">Xóa</Button>
-                                  </Stack>
-                                </TableCell>
-
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  )}
-        </Stack>
-        
+          <CrudTable title={title} handleAdd={handleAdd} handleClose={handleClose} columns={columns} formData={formData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} 
+                    loading={loading} open={open} dataResult={dataResult} handleEdit={handleEdit} handleDelete={handleDelete} />
     );
 }
 
-export default Sizes;
+export default Brands;   

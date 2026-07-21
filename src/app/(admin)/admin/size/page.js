@@ -1,13 +1,9 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import {Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Stack, Chip, CircularProgress } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import CustomModal from '@/app/components/Modal';
 import { supabase } from '@/utils/supabase';
+import CrudTable from '@/app/components/CrudTable'
 
-const title = 'kích cỡ';
+const title = 'kích cỡ ';
 const tableName = 'sizes';
 const columns = [
   {
@@ -17,7 +13,7 @@ const columns = [
   },
   {
       field: 'name',
-      label: 'Tên kích cỡ',
+      label: 'Tên ' + title,
       type:'text'
   },
   {
@@ -26,40 +22,7 @@ const columns = [
       type:'text'
   }
 ]
-const renderCell = (row,column) =>{
-    const cellValue = row[column.field];
-    console.log(column.field + ': ' + cellValue);
-    switch (column.type){
-      case 'text':
-        return <TableCell key={column.field}>{cellValue}</TableCell>;
-        break;
-      case 'color':
-        return <TableCell>
-            <Box sx={{
-                backgroundColor: cellValue,
-                width: '30px',
-                height: '30px',
-                border: '1px solid black'
-            }}></Box></TableCell>
-        break;
-      case 'img':
-        return <TableCell>
-                <Box sx={{
-                    width: '100px',
-                    height:'70px',
-                }}>
-                    <img style={{
-                        maxWidth: '100%',
-                        maxHeight: '100%'
-                    }} src={cellValue} alt={cellValue} />
-                </Box>
-            </TableCell>
-        break;
-      default:
-        return <TableCell key={column.field}>{cellValue}</TableCell>; 
-    }
-}
-
+const listCol = columns.map((item) => item.field).join(",")
 const initialForm = columns.reduce((acc,item) => {
   acc[item.field] = '';
   return acc;
@@ -68,15 +31,11 @@ const initialForm = columns.reduce((acc,item) => {
 const Sizes = () => {
     const [dataResult, setDataResult] = useState([]);
     const [loading, setLoading] = useState(true);
-    const fetchSizes = async () => {
+    const fetchData = async () => {
         try {
             const {data,error} = await supabase
                 .from(tableName)
-                .select(`
-                    id,
-                    name,
-                    code
-                `);
+                .select(listCol);
             if(error) throw error;
             setDataResult(data || []);
         }
@@ -87,7 +46,7 @@ const Sizes = () => {
         }
     }
     useEffect(() => {
-        fetchSizes();
+        fetchData();
     }, []);
 
     const [open, setOpen] = useState(false);
@@ -147,7 +106,7 @@ const Sizes = () => {
       }
       console.log('Success: ',data);
         handleClose(); 
-        fetchSizes();
+        fetchData();
       } catch (error){
         console.error('Lỗi lấy data từ Supabase:', error.message);
       }
@@ -166,74 +125,22 @@ const Sizes = () => {
         }
         console.log('Success: ',data);
           handleClose(); 
-          fetchSizes();
+          fetchData();
       }
     catch (error){
         console.error('Lỗi lấy data từ Supabase:', error.message);
       }
   }
 
-
     useEffect(()=>
     {
       console.log(formData);
     },[formData])
-    return(
-        <Stack spacing={3}>
-            <Stack sx={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
-                Danh sách {title}
-                </Typography>
-                <Button onClick={() => handleAdd()} variant="contained" startIcon={<AddIcon />} color="success">
-                    Thêm {title}
-                </Button>
-                <CustomModal open={open} handleClose={handleClose} columns={columns} formData={formData}
-                            handleInputChange={handleInputChange} handleSubmit={handleSubmit}/>
-            </Stack>
-                  {loading ? (
-                    <Stack sx={{ alignItems: 'center', py: 5 }}><CircularProgress /></Stack>
-                  ) : (
-                    <TableContainer component={Paper} sx={{ boxShadow: 2 }}>
-                      <Table aria-label="database table">
-                        <TableHead sx={{ backgroundColor: '#eeeeee' }}>
-                          <TableRow>
-                            <TableCell style={{ fontWeight: 'bold' }}>ID</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }}>Tên</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }}>Code</TableCell>
-                            <TableCell style={{ fontWeight: 'bold' }} align="center">Thao tác</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          {dataResult.length === 0 ? (
-                            <TableRow>
-                              <TableCell colSpan={5} align="center">Chưa có {title} trong database</TableCell>
-                            </TableRow>
-                          ) : (
-                            dataResult.map((row) => (
-                              <TableRow key={row.id} hover>
-                                  {
-                                    columns.map((column) =>{
-                                      return renderCell(row,column)
-                                    })
-                                  }
-                                <TableCell align="center">
-                                  <Stack sx={{ flexDirection: 'row', gap: 1, justifyContent: 'center' }}>
-                                    <Button onClick={() => handleEdit(row)} size="small" variant="outlined" startIcon={<EditIcon />} color="info">Sửa</Button>
-                                    <Button onClick={() => handleDelete(row)} size="small" variant="outlined" startIcon={<DeleteIcon />} color="error">Xóa</Button>
-                                  </Stack>
-                                </TableCell>
-                              </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  )}
 
-                  
-        </Stack>
-        
+    return(
+          <CrudTable title={title} handleAdd={handleAdd} handleClose={handleClose} columns={columns} formData={formData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} 
+                    loading={loading} open={open} dataResult={dataResult} handleEdit={handleEdit} handleDelete={handleDelete} />
     );
 }
 
-export default Sizes;
+export default Sizes;   
