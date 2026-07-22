@@ -1,8 +1,11 @@
+'use client';
+import React, { useState, useEffect } from 'react';
 import {Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Stack, Chip, CircularProgress } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
-import CustomModal from '@/app/components/Modal'
+import CustomModal from '@/app/components/Modal';
+import TablePagination from '@mui/material/TablePagination';
 
 const renderCell = (row,column,i) =>{
     const cellValue = row[column.field];
@@ -38,8 +41,9 @@ const renderCell = (row,column,i) =>{
     }
 }
 
-const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChange,handleSubmit,loading,open,dataResult,handleEdit,handleDelete}) =>{
-    return(
+const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChange,handleSubmit,loading,open,dataResult,handleEdit,handleDelete,page,totalCount,handleChangePage,rowsPerPage,handleChangeRowsPerPage}) =>{
+  return(
+        <>
         <Stack spacing={3}>
             <Stack sx={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
@@ -93,9 +97,17 @@ const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChan
                     </TableContainer>
                   )}
 
-                  
+          <TablePagination
+            component="div"
+            count={totalCount}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={rowsPerPage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage='Số dòng mỗi trang: '
+          />   
         </Stack>
-        
+        </>
     );
 }
 
