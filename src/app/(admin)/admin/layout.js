@@ -18,12 +18,12 @@ const MenuItem = [
     {
       text: "Quản lý sản phẩm gốc",
       icon: <CategoryIcon />,
-      href: "/admin/product"
+      href: "/admin/manage/product"
     },
     {
       text: "Quản lý biến thể sản phẩm",
       icon: <CategoryIcon />,
-      href: "/admin/product_variant"
+      href: "/admin/manage/product_variant"
     },
     {
       type: "divider"
@@ -31,27 +31,27 @@ const MenuItem = [
     {
       text: "Kích cỡ",
       icon: <CategoryIcon />,
-      href: "/admin/size"
+      href: "/admin/manage/sizes"
     },
     {
       text: "Màu sắc",
       icon: <CategoryIcon />,
-      href: "/admin/color"
+      href: "/admin/manage/colors"
     },
     {
       text: "Thương hiệu",
       icon: <CategoryIcon />,
-      href: "/admin/brand"
+      href: "/admin/manage/brands"
     },
     {
       text: "Danh mục sản phẩm",
       icon: <CategoryIcon />,
-      href: "/admin/category"
+      href: "/admin/manage/categories"
     },
     {
       text: "Phân loại sản phẩm",
       icon: <CategoryIcon />,
-      href: "/admin/product_category"
+      href: "/admin/manage/product_category"
     },
 
   ]

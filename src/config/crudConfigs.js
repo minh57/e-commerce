@@ -11,7 +11,7 @@ export const crudConfigs = {
             },
             {
                 field: 'name',
-                label: 'Tên ' + title,
+                label: 'Tên màu sắc',
                 type:'text'
             },
             {
@@ -33,7 +33,7 @@ export const crudConfigs = {
             },
             {
                 field: 'name',
-                label: 'Tên ' + title,
+                label: 'Tên kích cỡ',
                 type:'text'
             },
             {
@@ -43,5 +43,27 @@ export const crudConfigs = {
             }
         ]
     },
+    // Quản lý thương hiệu
+    brands: {
+        title: 'Quản lý thương hiệu',
+        tableName: 'brands',
+        columns: [
+            {
+                field: 'id',
+                label: 'ID',
+                type: 'text'
+            },
+            {
+                field: 'name',
+                label: 'Tên thương hiệu',
+                type:'text'
+            },
+            {
+                field: 'slug',
+                label: 'slug',
+                type:'text'
+            }
+        ]
+    }
 
 }
