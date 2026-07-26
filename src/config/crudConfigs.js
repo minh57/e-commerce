@@ -3,6 +3,10 @@ export const crudConfigs = {
     colors: {
         title: 'Quản lý Màu Sắc',
         tableName: 'colors',
+        primaryKey: 'id',
+        orderBy:[
+            {column:'id',ascending:true}
+        ],
         columns: [
             {
                 field: 'id',
@@ -25,6 +29,10 @@ export const crudConfigs = {
     sizes: {
         title: 'Quản lý Kích cỡ',
         tableName: 'sizes',
+        primaryKey:'id',
+        orderBy: [
+            {column: 'id',ascending:true}
+        ],
         columns: [
             {
                 field: 'id',
@@ -47,6 +55,10 @@ export const crudConfigs = {
     brands: {
         title: 'Quản lý thương hiệu',
         tableName: 'brands',
+        primaryKey: 'id',
+        orderBy: [
+            {column:'id',ascending: true}
+        ],
         columns: [
             {
                 field: 'id',
@@ -64,6 +76,55 @@ export const crudConfigs = {
                 type:'text'
             }
         ]
-    }
+    },
+    // Quản lý danh mục
+    categories: {
+        title: 'Quản lý danh mục sản phẩm',
+        tableName: 'categories',
+        primaryKey:'id',
+        orderBy: [
+            {column:'id',ascending: true}
+        ],
+        columns: [
+            {
+                field: 'id',
+                label: 'ID',
+                type: 'text'
+            },
+            {
+                field: 'name',
+                label: 'Tên danh mục',
+                type:'text'
+            },
+            {
+                field: 'slug',
+                label: 'slug',
+                type:'text'
+            }
+        ]
+    },
+    // Quản lý phân loại sản phẩm
+    product_categories: {
+        title: 'Quản lý phân loại sản phẩm',
+        tableName: 'product_categories',
+        primaryKey: ['product_id','category_id'],
+        orderBy: [
+            {column: 'product_id',ascending: true},
+            {column: 'category_id',ascending: true}
+        ],
+        columns: [
+            {
+                field: 'product_id',
+                label: 'ID sản phẩm',
+                type: 'text'
+            },
+            {
+                field: 'category_id',
+                label: 'ID danh mục',
+                type:'text'
+            }
+        ]
+    },
+
 
 }

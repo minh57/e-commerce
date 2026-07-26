@@ -76,8 +76,8 @@ const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChan
                               <TableCell colSpan={5} align="center">Chưa có {title} trong database</TableCell>
                             </TableRow>
                           ) : (
-                            dataResult.map((row) => (
-                              <TableRow key={row.id} hover>
+                            dataResult.map((row,i) => (
+                              <TableRow key={i} hover>
                                   {
                                     columns.map((column,i) =>{
                                       return renderCell(row,column,i)

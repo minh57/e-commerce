@@ -51,7 +51,7 @@ const MenuItem = [
     {
       text: "Phân loại sản phẩm",
       icon: <CategoryIcon />,
-      href: "/admin/manage/product_category"
+      href: "/admin/manage/product_categories"
     },
 
   ]

@@ -6,7 +6,7 @@ import { crudConfigs } from '@/config/crudConfigs';
 
 const DynamicCrudPage = ({slug}) => {
     const config = crudConfigs[slug];
-    const {title,tableName,columns} = config
+    const {title,tableName,primaryKey,orderBy,columns} = config
     const listCol = columns.map((item) => item.field).join(",")
     const initialForm = columns.reduce((acc,item) => {
       acc[item.field] = '';
@@ -33,12 +33,22 @@ const DynamicCrudPage = ({slug}) => {
             setLoading(true);
             const from = page * rowsPerPage;
             const to = from + rowsPerPage - 1;
+            let query = supabase
+              .from(tableName)
+              .select(listCol,{count:'exact'})
+              .range(from,to);
 
-            const {data,count,error} = await supabase
-                .from(tableName)
-                .select(listCol, {count: 'exact'})
-                .range(from,to)
-                .order('id',{ascending: true});
+            if(orderBy && Array.isArray(orderBy)){
+              orderBy.forEach((orderItem) => {
+                query = query.order(orderItem.column, {
+                  ascending: orderItem.ascending ?? true,
+                });
+              });
+            }else{
+                query = query.order('id',{ascending: true});
+            }
+
+            const {data,count,error} = await query;
             if(error) throw error;
             setDataResult(data || []);
             if (count !== null) setTotalCount(count);
@@ -85,24 +95,39 @@ const DynamicCrudPage = ({slug}) => {
       e.preventDefault();
       try{
         let response;
-      if(formData.id){
-        response = await supabase
-          .from(tableName)
-          .update(formData)
-          .eq('id',formData.id)
-          .select();
-      }
-      else {
-        const dataToInsert = { ...formData};
-        if(dataToInsert.id === ''){
-          delete dataToInsert.id;
-        }
+        const isUpdate = Array.isArray(primaryKey)
+          ? primaryKey.every((key) => formData[key] !== '' && formData[key] !== undefined)
+          : !!formData[primaryKey];
 
-        response = await supabase
-        .from(tableName)
-        .insert([dataToInsert])
-        .select();
-      }      
+          if(isUpdate){
+            //Update
+            let query = supabase
+              .from(tableName)
+              .update(formData);
+
+              if(Array.isArray(primaryKey)){
+                primaryKey.forEach((key) => {
+                  query = query.eq(key, formData[key]);
+                });
+              }else{
+                query = query.eq(primaryKey, formData[primaryKey])
+              }
+
+              console.log('pk: ',formData[primaryKey]);
+              response = await query;
+          }
+          else {
+            //Insert
+            const dataToInsert = { ...formData};
+            if(dataToInsert.id === ''){
+              delete dataToInsert.id;
+            }
+
+            response = await supabase
+              .from(tableName)
+              .insert([dataToInsert])
+              .select();
+          }    
       
       const {data,error} = response;
       if(error){
