@@ -116,12 +116,14 @@ export const crudConfigs = {
             {
                 field: 'product_id',
                 label: 'ID sản phẩm',
-                type: 'text'
+                type: 'select',
+                foreignTable: 'products'
             },
             {
                 field: 'category_id',
                 label: 'ID danh mục',
-                type:'text'
+                type:'select',
+                foreignTable: 'categories'
             }
         ]
     },

@@ -33,6 +33,7 @@ const DynamicCrudPage = ({slug}) => {
             setLoading(true);
             const from = page * rowsPerPage;
             const to = from + rowsPerPage - 1;
+
             let query = supabase
               .from(tableName)
               .select(listCol,{count:'exact'})
@@ -59,6 +60,7 @@ const DynamicCrudPage = ({slug}) => {
             setLoading(false);
         }
     }
+    
     useEffect(() => {
         fetchData();
     }, [page,rowsPerPage]);
@@ -113,7 +115,7 @@ const DynamicCrudPage = ({slug}) => {
                 query = query.eq(primaryKey, formData[primaryKey])
               }
 
-              console.log('pk: ',formData[primaryKey]);
+              // console.log('pk: ',formData[primaryKey]);
               response = await query;
           }
           else {
@@ -143,12 +145,24 @@ const DynamicCrudPage = ({slug}) => {
     
     const handleDelete = async (row) =>{
       try{
-        let response = await supabase 
+        console.log("pk "+ primaryKey);
+        let response;
+        let query = supabase 
           .from(tableName)
           .delete()
-          .eq('id',row.id)
-          .select()
+
+          if(Array.isArray(primaryKey)){
+              primaryKey.forEach((key) =>{
+                query = query.eq(key,formData[key]);
+              })
+          }else{
+            query = query.eq(primaryKey,formData[primaryKey]);
+          }
+          query = query.select();
+          response = await query;
+          
               const {data,error} = response;
+
         if(error){
           throw error
         }
@@ -163,13 +177,13 @@ const DynamicCrudPage = ({slug}) => {
 
     useEffect(()=>
     {
-      console.log(formData);
+      // console.log(formData);
     },[formData])
 
     return(
           <CrudTable title={title} handleAdd={handleAdd} handleClose={handleClose} columns={columns} formData={formData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} 
                     loading={loading} open={open} dataResult={dataResult} handleEdit={handleEdit} handleDelete={handleDelete} 
-                    page={page} rowsPerPage={rowsPerPage} totalCount={totalCount} handleChangePage={handleChangePage} handleChangeRowsPerPage={handleChangeRowsPerPage}/>
+                    page={page} rowsPerPage={rowsPerPage} totalCount={totalCount} handleChangePage={handleChangePage} handleChangeRowsPerPage={handleChangeRowsPerPage} primaryKey={primaryKey}/>
     );
 }
 

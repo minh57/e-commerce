@@ -1,4 +1,6 @@
-import { Modal,Box,Typography,TextField,Button} from "@mui/material";
+import { Modal,Box,Typography,TextField,Button,Select,MenuItem,InputLabel} from "@mui/material";
+import { supabase } from "@/utils/supabase";
+
 const style = {
   position: 'absolute',
   top: '50%',
@@ -14,32 +16,75 @@ const style = {
   flexDirection: 'column',
   '& > :not(style)': { m: 1 }
 };
-const CustomModal = ({open,handleClose,columns,handleInputChange,handleSubmit,formData}) =>{
+
+const renderInput = async (formData,col,i) =>{
+    console.log(col.type)
+    if(col.type === 'select'){
+        const response = await supabase
+            .from(col.foreignTable)
+            .select('*')
+        
+        const {data,error} = response;
+        console.log(data);
+        return(
+            <>
+                <InputLabel id="demo-simple-select-outlined-label">{col.label}</InputLabel>
+                    <Select
+                    labelId="demo-simple-select-outlined-label"
+                    id="demo-simple-select-outlined"
+                    value={col.field}
+                    label={col.label}>
+                            {
+                                data.map((dt) => {
+                                    return(
+                                        <MenuItem value={dt.id}>{dt.name}</MenuItem>
+                                    )
+                                })
+                            }
+                    </Select>
+            </>
+        )
+    }
+    else{
+        return(
+            <TextField key={i}
+                id={col.field}
+                label={col.label}  
+                name={col.field}
+                value={formData[col.field]}
+                onChange = {(e) => handleInputChange(e)}
+            />
+        )
+    }
+}
+
+const CustomModal = ({open,handleClose,columns,handleInputChange,handleSubmit,formData,primaryKey}) =>{
     return(
         <>
                     <Modal
                 open ={open}
                 onClose = {handleClose}
                 aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
+                aria-describedby="modal-modal-description">
+
                 <Box sx={style}
-                    component='form'
-                >   
+                    component='form'>   
                         <Typography>
                             {formData.id === '' ? 'Thêm' : 'Sửa'}
                         </Typography>
                     {
-                        columns.filter((item) => item.field != 'id').map((item,i) => {
-                            return(
-                                <TextField key={i}
-                                    id={item.field}
-                                    label={item.label}  
-                                    name={item.field}
-                                    value={formData[item.field]}
-                                    onChange = {(e) => handleInputChange(e)}
-                                />
-                            )
+                        columns.filter((col) => col.field != 'id').map((col,i) => {
+                            return renderInput(formData,col,i);
+                            // return(
+
+                            //     <TextField key={i}
+                            //         id={item.field}
+                            //         label={item.label}  
+                            //         name={item.field}
+                            //         value={formData[item.field]}
+                            //         onChange = {(e) => handleInputChange(e)}
+                            //     />
+                            // )
                         })
                     }
                     <Button onClick={handleSubmit} sx={{

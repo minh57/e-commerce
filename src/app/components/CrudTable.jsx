@@ -41,7 +41,7 @@ const renderCell = (row,column,i) =>{
     }
 }
 
-const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChange,handleSubmit,loading,open,dataResult,handleEdit,handleDelete,page,totalCount,handleChangePage,rowsPerPage,handleChangeRowsPerPage}) =>{
+const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChange,handleSubmit,loading,open,dataResult,handleEdit,handleDelete,page,totalCount,handleChangePage,rowsPerPage,handleChangeRowsPerPage,primaryKey}) =>{
   return(
         <>
         <Stack spacing={3}>
@@ -53,7 +53,7 @@ const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChan
                     Thêm {title}
                 </Button>
                 <CustomModal open={open} handleClose={handleClose} columns={columns} formData={formData}
-                            handleInputChange={handleInputChange} handleSubmit={handleSubmit}/>
+                            handleInputChange={handleInputChange} handleSubmit={handleSubmit} primaryKey={primaryKey}/>
             </Stack>
                   {loading ? (
                     <Stack sx={{ alignItems: 'center', py: 5 }}><CircularProgress /></Stack>
