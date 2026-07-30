@@ -1,5 +1,7 @@
-import { Modal,Box,Typography,TextField,Button,Select,MenuItem,InputLabel} from "@mui/material";
+'use client'
+import { Modal,Box,Typography,TextField,Button,Select,MenuItem,InputLabel,FormControl} from "@mui/material";
 import { supabase } from "@/utils/supabase";
+import React, { useState, useEffect } from 'react';
 
 const style = {
   position: 'absolute',
@@ -35,9 +37,11 @@ const renderInput = async (formData,col,i) =>{
                     value={col.field}
                     label={col.label}>
                             {
-                                data.map((dt) => {
+                                data.map((dt,i) => {
                                     return(
-                                        <MenuItem value={dt.id}>{dt.name}</MenuItem>
+                                        <FormControl key={i}  variant="outlined" sx={{ m: 1, minWidth: 120 }}>
+                                            <MenuItem value={dt.id}>{dt.name}</MenuItem>
+                                        </FormControl>
                                     )
                                 })
                             }
@@ -59,6 +63,16 @@ const renderInput = async (formData,col,i) =>{
 }
 
 const CustomModal = ({open,handleClose,columns,handleInputChange,handleSubmit,formData,primaryKey}) =>{
+    const [selectOption, setSelectOptions] = useState({})
+
+    useEffect(() =>{
+        const loadSelectData = async () => {
+            const result = {};
+
+            columns.map()
+        }
+    },[columns]);
+
     return(
         <>
                     <Modal
@@ -97,4 +111,8 @@ const CustomModal = ({open,handleClose,columns,handleInputChange,handleSubmit,fo
     );
 }
 
+
+
+
 export default CustomModal;
+
