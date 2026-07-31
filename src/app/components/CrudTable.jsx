@@ -41,7 +41,7 @@ const renderCell = (row,column,i) =>{
     }
 }
 
-const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChange,handleSubmit,loading,open,dataResult,handleEdit,handleDelete,page,totalCount,handleChangePage,rowsPerPage,handleChangeRowsPerPage,primaryKey}) =>{
+const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChange,handleSubmit,loading,open,dataResult,handleEdit,handleDelete,page,totalCount,handleChangePage,rowsPerPage,handleChangeRowsPerPage,primaryKey,isEdit}) =>{
   return(
         <>
         <Stack spacing={3}>
@@ -52,7 +52,7 @@ const CrudTable = ({title,handleAdd,handleClose,columns,formData,handleInputChan
                 <Button onClick={() => handleAdd()} variant="contained" startIcon={<AddIcon />} color="success">
                     Thêm {title}
                 </Button>
-                <CustomModal open={open} handleClose={handleClose} columns={columns} formData={formData}
+                <CustomModal isEdit={isEdit} open={open} handleClose={handleClose} columns={columns} formData={formData}
                             handleInputChange={handleInputChange} handleSubmit={handleSubmit} primaryKey={primaryKey}/>
             </Stack>
                   {loading ? (

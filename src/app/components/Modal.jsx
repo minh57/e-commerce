@@ -19,59 +19,7 @@ const style = {
   '& > :not(style)': { m: 1 }
 };
 
-const renderInput = async (formData,col,i) =>{
-    console.log(col.type)
-    if(col.type === 'select'){
-        const response = await supabase
-            .from(col.foreignTable)
-            .select('*')
-        
-        const {data,error} = response;
-        console.log(data);
-        return(
-            <>
-                <InputLabel id="demo-simple-select-outlined-label">{col.label}</InputLabel>
-                    <Select
-                    labelId="demo-simple-select-outlined-label"
-                    id="demo-simple-select-outlined"
-                    value={col.field}
-                    label={col.label}>
-                            {
-                                data.map((dt,i) => {
-                                    return(
-                                        <FormControl key={i}  variant="outlined" sx={{ m: 1, minWidth: 120 }}>
-                                            <MenuItem value={dt.id}>{dt.name}</MenuItem>
-                                        </FormControl>
-                                    )
-                                })
-                            }
-                    </Select>
-            </>
-        )
-    }
-    else{
-        return(
-            <TextField key={i}
-                id={col.field}
-                label={col.label}  
-                name={col.field}
-                value={formData[col.field]}
-                onChange = {(e) => handleInputChange(e)}
-            />
-        )
-    }
-}
-
-const CustomModal = ({open,handleClose,columns,handleInputChange,handleSubmit,formData,primaryKey}) =>{
-    const [selectOption, setSelectOptions] = useState({})
-
-    useEffect(() =>{
-        const loadSelectData = async () => {
-            const result = {};
-
-            columns.map()
-        }
-    },[columns]);
+const CustomModal = ({open,handleClose,columns,handleInputChange,handleSubmit,formData,primaryKey,isEdit}) =>{  
 
     return(
         <>
@@ -84,23 +32,20 @@ const CustomModal = ({open,handleClose,columns,handleInputChange,handleSubmit,fo
                 <Box sx={style}
                     component='form'>   
                         <Typography>
-                            {formData.id === '' ? 'Thêm' : 'Sửa'}
+                            {isEdit ? 'Sửa' : 'Thêm'}
                         </Typography>
-                    {
-                        columns.filter((col) => col.field != 'id').map((col,i) => {
-                            return renderInput(formData,col,i);
-                            // return(
-
-                            //     <TextField key={i}
-                            //         id={item.field}
-                            //         label={item.label}  
-                            //         name={item.field}
-                            //         value={formData[item.field]}
-                            //         onChange = {(e) => handleInputChange(e)}
-                            //     />
-                            // )
-                        })
-                    }
+                        {
+                            columns.filter((col) => col.field !== 'id').map((col,i) => {
+                                return(
+                                    <Box key={i}>
+                                    <TextField
+                                    onChange={(e) => handleInputChange(e)}
+                                    name={col.field} label={col.label} value={formData[col.field]} />
+                                    </Box>
+                                );
+                            })
+                        }
+                    
                     <Button onClick={handleSubmit} sx={{
                         backgroundColor: 'blue',
                         color: 'white'

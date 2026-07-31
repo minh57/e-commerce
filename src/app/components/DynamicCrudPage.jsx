@@ -16,6 +16,8 @@ const DynamicCrudPage = ({slug}) => {
     const [dataResult, setDataResult] = useState([]);
     const [loading, setLoading] = useState(true);
 
+    const [isEdit,setIsEdit] = useState();
+
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(10);  
     const [totalCount,setTotalCount] = useState(0);
@@ -70,6 +72,7 @@ const DynamicCrudPage = ({slug}) => {
     const handleClose = () => setOpen(false);
 
     const [formData,setFormData] = useState(initialForm);
+    const [oldData,setOldData] = useState(initialForm);
 
     const updateFormField = (name,value) =>{
       setFormData((prev) => ({
@@ -84,51 +87,64 @@ const DynamicCrudPage = ({slug}) => {
     }
 
     const handleAdd = () =>{
+      setIsEdit(false);
       setFormData(initialForm);
       handleOpen();
     }
 
     const handleEdit = (row) => {
+      setIsEdit(true);
+      setOldData(row);
       setFormData(row);
       handleOpen();
     }
 
     const handleSubmit = async (e) =>{
       e.preventDefault();
+      console.log(primaryKey);
       try{
         let response;
-        const isUpdate = Array.isArray(primaryKey)
-          ? primaryKey.every((key) => formData[key] !== '' && formData[key] !== undefined)
-          : !!formData[primaryKey];
-
-          if(isUpdate){
+          if(isEdit){
             //Update
             let query = supabase
-              .from(tableName)
-              .update(formData);
-
+              .from(tableName);
+              
+              // console.log(Number(formData.category_id));
               if(Array.isArray(primaryKey)){
+                query = query.update(formData);                
                 primaryKey.forEach((key) => {
-                  query = query.eq(key, formData[key]);
+                  query = query.eq(key, Number(oldData[key]));
                 });
+
+                // query = query.eq('product_id', oldData.product_id);
               }else{
+                query = query.update(formData);
                 query = query.eq(primaryKey, formData[primaryKey])
               }
-
               // console.log('pk: ',formData[primaryKey]);
               response = await query;
           }
           else {
             //Insert
             const dataToInsert = { ...formData};
-            if(dataToInsert.id === ''){
-              delete dataToInsert.id;
+            console.log(tableName);
+            if(tableName === 'product_categories'){
+              console.log(dataToInsert);
+              response = await supabase
+                .from(tableName)
+                .insert([dataToInsert])
+                .select();
             }
+            else{
+              if(dataToInsert.id === ''){
+                delete dataToInsert.id;
+              }
 
-            response = await supabase
-              .from(tableName)
-              .insert([dataToInsert])
-              .select();
+              response = await supabase
+                .from(tableName)
+                .insert([dataToInsert])
+                .select();
+            }
           }    
       
       const {data,error} = response;
@@ -145,7 +161,6 @@ const DynamicCrudPage = ({slug}) => {
     
     const handleDelete = async (row) =>{
       try{
-        console.log("pk "+ primaryKey);
         let response;
         let query = supabase 
           .from(tableName)
@@ -183,7 +198,7 @@ const DynamicCrudPage = ({slug}) => {
     return(
           <CrudTable title={title} handleAdd={handleAdd} handleClose={handleClose} columns={columns} formData={formData} handleInputChange={handleInputChange} handleSubmit={handleSubmit} 
                     loading={loading} open={open} dataResult={dataResult} handleEdit={handleEdit} handleDelete={handleDelete} 
-                    page={page} rowsPerPage={rowsPerPage} totalCount={totalCount} handleChangePage={handleChangePage} handleChangeRowsPerPage={handleChangeRowsPerPage} primaryKey={primaryKey}/>
+                    page={page} rowsPerPage={rowsPerPage} totalCount={totalCount} handleChangePage={handleChangePage} handleChangeRowsPerPage={handleChangeRowsPerPage} primaryKey={primaryKey} isEdit={isEdit}/>
     );
 }
 
